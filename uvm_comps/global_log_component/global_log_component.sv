@@ -19,8 +19,8 @@ class global_log_component extends uvm_component;
 
         // Configure the catcher with ID-to-filename mappings
         // Example configuration:
-        catcher.add_log_target("CORE_WR", "core_activity.log");
-        //catcher.add_log_target("CORE_RD", "core_activity.log"); // Log to the same file
+        catcher.add_log_target("REG_WRITE", "core_activity.log");
+        //catcher.add_log_target("REG_READ", "core_activity.log"); // Log to the same file
 
         // Open the configured log files
         catcher.open_log_files();
