@@ -537,6 +537,185 @@ endclass
 
 ---
 
+## Interface 设计
+
+### 设计决策
+
+- Interface 中使用 **clocking block** 进行信号同步
+- 原因：clocking block 提供明确的时序关系，避免竞争条件
+
+### APB Interface
+
+```systemverilog
+interface apb_interface #(
+    parameter ADDR_WIDTH = 32,
+    parameter DATA_WIDTH = 32
+) (
+    input logic PCLK,
+    input logic PRESETn
+);
+    // 信号声明
+    logic                    PSEL;
+    logic                    PENABLE;
+    logic [ADDR_WIDTH-1:0]   PADDR;
+    logic                    PWRITE;
+    logic [DATA_WIDTH-1:0]   PWDATA;
+    logic [DATA_WIDTH-1:0]   PRDATA;
+    logic                    PREADY;
+    logic                    PSLVERR;
+    logic [DATA_WIDTH/8-1:0] PSTRB;  // APB4
+    logic [2:0]              PPROT;  // APB4
+
+    // Master clocking block
+    clocking master_cb @(posedge PCLK);
+        default input #1 output #1;
+        output PSEL;
+        output PENABLE;
+        output PADDR;
+        output PWRITE;
+        output PWDATA;
+        output PSTRB;
+        output PPROT;
+        input  PRDATA;
+        input  PREADY;
+        input  PSLVERR;
+    endclocking
+
+    // Slave clocking block
+    clocking slave_cb @(posedge PCLK);
+        default input #1 output #1;
+        input  PSEL;
+        input  PENABLE;
+        input  PADDR;
+        input  PWRITE;
+        input  PWDATA;
+        input  PSTRB;
+        input  PPROT;
+        output PRDATA;
+        output PREADY;
+        output PSLVERR;
+    endclocking
+
+    // Monitor clocking block
+    clocking monitor_cb @(posedge PCLK);
+        default input #1 output #1;
+        input PSEL;
+        input PENABLE;
+        input PADDR;
+        input PWRITE;
+        input PWDATA;
+        input PRDATA;
+        input PREADY;
+        input PSLVERR;
+        input PSTRB;
+        input PPROT;
+    endclocking
+
+    // Modports
+    modport master  (clocking master_cb,  input PRESETn);
+    modport slave   (clocking slave_cb,   input PRESETn);
+    modport monitor (clocking monitor_cb, input PRESETn);
+
+endinterface
+```
+
+### AHB Interface
+
+```systemverilog
+interface ahb_interface #(
+    parameter ADDR_WIDTH = 32,
+    parameter DATA_WIDTH = 32
+) (
+    input logic HCLK,
+    input logic HRESETn
+);
+    // 信号声明
+    logic [ADDR_WIDTH-1:0] HADDR;
+    logic [1:0]            HTRANS;
+    logic                  HWRITE;
+    logic [2:0]            HSIZE;
+    logic [2:0]            HBURST;
+    logic [3:0]            HPROT;
+    logic [DATA_WIDTH-1:0] HWDATA;
+    logic [DATA_WIDTH-1:0] HRDATA;
+    logic                  HREADY;
+    logic [1:0]            HRESP;
+    logic                  HSEL;
+    logic                  HMASTLOCK;
+    logic                  HBUSREQ;  // Full AHB
+    logic                  HGRANT;   // Full AHB
+
+    // Master clocking block
+    clocking master_cb @(posedge HCLK);
+        default input #1 output #1;
+        output HADDR;
+        output HTRANS;
+        output HWRITE;
+        output HSIZE;
+        output HBURST;
+        output HPROT;
+        output HWDATA;
+        output HMASTLOCK;
+        output HBUSREQ;
+        input  HRDATA;
+        input  HREADY;
+        input  HRESP;
+        input  HGRANT;
+    endclocking
+
+    // Slave clocking block
+    clocking slave_cb @(posedge HCLK);
+        default input #1 output #1;
+        input  HADDR;
+        input  HTRANS;
+        input  HWRITE;
+        input  HSIZE;
+        input  HBURST;
+        input  HPROT;
+        input  HWDATA;
+        input  HSEL;
+        input  HMASTLOCK;
+        output HRDATA;
+        output HREADY;
+        output HRESP;
+    endclocking
+
+    // Monitor clocking block
+    clocking monitor_cb @(posedge HCLK);
+        default input #1 output #1;
+        input HADDR;
+        input HTRANS;
+        input HWRITE;
+        input HSIZE;
+        input HBURST;
+        input HPROT;
+        input HWDATA;
+        input HRDATA;
+        input HREADY;
+        input HRESP;
+        input HSEL;
+        input HMASTLOCK;
+        input HBUSREQ;
+        input HGRANT;
+    endclocking
+
+    // Modports
+    modport master  (clocking master_cb,  input HRESETn);
+    modport slave   (clocking slave_cb,   input HRESETn);
+    modport monitor (clocking monitor_cb, input HRESETn);
+
+endinterface
+```
+
+### 关键点
+
+- **Clocking block** 提供明确的时序关系（`#1` 延迟）
+- **Modport** 定义信号方向，防止错误访问
+- **Monitor clocking block** 只读，用于被动观测
+- Driver 使用 `master_cb` 或 `slave_cb`，Monitor 使用 `monitor_cb`
+
+---
+
 ## Testbench 结构
 
 ### 设计决策

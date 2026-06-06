@@ -106,6 +106,16 @@ vip/amba/
 - Package 内部类名不加前缀（如 `apb_transaction`、`ahb_driver`）
 - 使用时：`import hx_apb_pkg::*;` 或 `hx_apb_pkg::apb_transaction`
 
+## 3.1 Interface 设计
+
+- Interface 中使用 **clocking block** 进行信号同步
+- 每个 interface 包含三个 clocking block：
+  - `master_cb`：Master Driver 使用
+  - `slave_cb`：Slave Driver 使用
+  - `monitor_cb`：Monitor 使用（只读）
+- 通过 modport 定义信号方向，防止错误访问
+- 详细实现见 `CONTEXT.md`
+
 ## 4. 宽度控制
 
 通过 `defines.svh` 中的宏控制信号宽度，interface 和 transaction 共用同一组宏：
