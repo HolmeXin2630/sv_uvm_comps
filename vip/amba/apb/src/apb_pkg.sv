@@ -7,8 +7,9 @@ package hx_apb_pkg;
 
     `include "apb_defines.svh"
 
+    // Components
+    `include "apb_transaction.sv"
     // TODO: `include remaining components
-    // `include "apb_transaction.sv"
     // ...
 
 endpackage
