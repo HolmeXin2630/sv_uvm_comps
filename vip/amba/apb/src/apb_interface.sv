@@ -22,7 +22,7 @@ interface apb_interface #(
 
     // Master clocking block
     clocking master_cb @(posedge PCLK);
-        default input #1 output #1;
+        default input #1 output #0;
         output PSEL;
         output PENABLE;
         output PADDR;

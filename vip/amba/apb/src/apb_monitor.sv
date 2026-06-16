@@ -4,7 +4,7 @@
 class apb_monitor extends uvm_monitor;
     `uvm_component_utils(apb_monitor)
 
-    virtual apb_interface.monitor_cb vif;
+    virtual apb_interface.monitor vif;
     uvm_analysis_port #(apb_transaction) ap;
 
     function new(string name, uvm_component parent);
@@ -24,8 +24,10 @@ class apb_monitor extends uvm_monitor;
             txn = apb_transaction::type_id::create("txn");
             txn.addr  = vif.monitor_cb.PADDR;
             txn.write = vif.monitor_cb.PWRITE;
+            `ifdef APB_APB4_ENABLE
             txn.strb  = vif.monitor_cb.PSTRB;
             txn.prot  = vif.monitor_cb.PPROT;
+            `endif
 
             if (txn.write)
                 txn.data = vif.monitor_cb.PWDATA;

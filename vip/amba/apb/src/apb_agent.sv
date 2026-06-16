@@ -20,6 +20,10 @@ class apb_agent extends uvm_agent;
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
 
+        // Get vif from config_db
+        if (!uvm_config_db#(virtual apb_interface)::get(this, "", "vif", cfg.vif))
+            `uvm_fatal("NOVIF", "Virtual interface not set for apb_agent")
+
         // Create monitor (always)
         mon = apb_monitor::type_id::create("mon", this);
 

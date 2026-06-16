@@ -21,11 +21,19 @@ module apb_slave_ram #(
     logic [DATA_WIDTH-1:0] mem [0:1023];
     int unsigned wait_cnt = 0;
 
+    // Combinational output for read data
+    always_comb begin
+        if (PSEL && PENABLE && !PWRITE && !INJECT_ERROR && wait_cnt >= WAIT_CYCLES) begin
+            PRDATA = mem[PADDR[11:2]];
+        end else begin
+            PRDATA = '0;
+        end
+    end
+
     always_ff @(posedge PCLK or negedge PRESETn) begin
         if (!PRESETn) begin
-            PREADY  <= 1'b1;
+            PREADY  <= 1'b0;
             PSLVERR <= 1'b0;
-            PRDATA  <= '0;
             wait_cnt <= 0;
         end else if (PSEL && PENABLE) begin
             if (wait_cnt < WAIT_CYCLES) begin
@@ -41,10 +49,11 @@ module apb_slave_ram #(
                     PSLVERR <= 1'b0;
                     if (PWRITE)
                         mem[PADDR[11:2]] <= PWDATA;
-                    else
-                        PRDATA <= mem[PADDR[11:2]];
                 end
             end
+        end else begin
+            PREADY <= 1'b0;
+            PSLVERR <= 1'b0;
         end
     end
 endmodule

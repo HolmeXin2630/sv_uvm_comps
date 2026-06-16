@@ -4,7 +4,7 @@
 class apb_driver extends uvm_driver #(apb_transaction);
     `uvm_component_utils(apb_driver)
 
-    virtual apb_interface.master_cb vif;
+    virtual apb_interface.master vif;
 
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -13,7 +13,7 @@ class apb_driver extends uvm_driver #(apb_transaction);
     task run_phase(uvm_phase phase);
         apb_transaction txn;
         forever begin
-            seq_item_port.get(txn);
+            seq_item_port.get_next_item(txn);
 
             // Idle cycles
             repeat (txn.idle_cycles) @(vif.master_cb);
@@ -26,8 +26,10 @@ class apb_driver extends uvm_driver #(apb_transaction);
             vif.master_cb.PWRITE  <= txn.write;
             if (txn.write)
                 vif.master_cb.PWDATA <= txn.data;
+            `ifdef APB_APB4_ENABLE
             vif.master_cb.PSTRB <= txn.strb;
             vif.master_cb.PPROT <= txn.prot;
+            `endif
 
             // ACCESS phase: PENABLE=1
             @(vif.master_cb);
@@ -45,6 +47,8 @@ class apb_driver extends uvm_driver #(apb_transaction);
             @(vif.master_cb);
             vif.master_cb.PSEL    <= 1'b0;
             vif.master_cb.PENABLE <= 1'b0;
+
+            seq_item_port.item_done();
         end
     endtask
 endclass

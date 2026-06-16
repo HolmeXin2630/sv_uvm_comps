@@ -4,6 +4,10 @@
 class apb_slverr_test extends apb_base_test;
     `uvm_component_utils(apb_slverr_test)
 
+    function new(string name, uvm_component parent);
+        super.new(name, parent);
+    endfunction
+
     task run_phase(uvm_phase phase);
         apb_write_seq wr_seq;
 

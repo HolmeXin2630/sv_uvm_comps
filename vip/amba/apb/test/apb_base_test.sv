@@ -8,6 +8,10 @@ class apb_base_test extends uvm_test;
     apb_agent         apb_agt;
     apb_system_config sys_cfg;
 
+    function new(string name = "apb_base_test", uvm_component parent = null);
+        super.new(name, parent);
+    endfunction
+
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
 

@@ -8,6 +8,10 @@ class apb_write_seq extends uvm_sequence #(apb_transaction);
     rand bit [`APB_ADDR_WIDTH-1:0] addr;
     rand bit [`APB_DATA_WIDTH-1:0] data;
 
+    function new(string name = "apb_write_seq");
+        super.new(name);
+    endfunction
+
     task body();
         apb_transaction txn;
         txn = apb_transaction::type_id::create("txn");
@@ -28,6 +32,10 @@ class apb_read_seq extends uvm_sequence #(apb_transaction);
     rand bit [`APB_ADDR_WIDTH-1:0] addr;
     bit [`APB_DATA_WIDTH-1:0] rdata;
 
+    function new(string name = "apb_read_seq");
+        super.new(name);
+    endfunction
+
     task body();
         apb_transaction txn;
         txn = apb_transaction::type_id::create("txn");
@@ -47,6 +55,10 @@ class apb_rw_seq extends uvm_sequence #(apb_transaction);
 
     int unsigned num_txns = 10;
 
+    function new(string name = "apb_rw_seq");
+        super.new(name);
+    endfunction
+
     task body();
         apb_transaction txn;
         repeat (num_txns) begin
@@ -63,6 +75,10 @@ class apb_slave_response_seq extends uvm_sequence #(apb_transaction);
     `uvm_object_utils(apb_slave_response_seq)
 
     bit [`APB_DATA_WIDTH-1:0] mem [bit [`APB_ADDR_WIDTH-1:0]];
+
+    function new(string name = "apb_slave_response_seq");
+        super.new(name);
+    endfunction
 
     task body();
         apb_transaction req, rsp;

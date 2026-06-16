@@ -4,7 +4,7 @@
 class apb_slave_driver extends uvm_driver #(apb_transaction);
     `uvm_component_utils(apb_slave_driver)
 
-    virtual apb_interface.slave_cb vif;
+    virtual apb_interface vif;
 
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -23,7 +23,7 @@ class apb_slave_driver extends uvm_driver #(apb_transaction);
 
             // Wait for ACCESS: PENABLE=1, PREADY=1
             @(vif.slave_cb);
-            while (!(vif.slave_cb.PENABLE && vif.slave_cb.PREADY))
+            while (!(vif.slave_cb.PENABLE && vif.PREADY))
                 @(vif.slave_cb);
 
             // Drive response

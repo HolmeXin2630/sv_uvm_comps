@@ -4,26 +4,40 @@ TEST ?= apb_smoke_test
 WAIT_CYCLES ?= 0
 INJECT_ERROR ?= 0
 
+UVM_HOME ?= /opt/synopsys/vcs/W-2024.09/etc/uvm-1.2
+
 COMPILE_OPTS = -sverilog -full64 -timescale=1ns/1ps
 COMPILE_OPTS += +define+UVM_PACKER_MAX_BYTES=1500000
 COMPILE_OPTS += +define+UVM_DISABLE_AUTO_ITEM_RECORDING
 COMPILE_OPTS += +incdir+../src
 COMPILE_OPTS += +incdir+../tb
 COMPILE_OPTS += +incdir+../test
+COMPILE_OPTS += +incdir+$(UVM_HOME)/src
 COMPILE_OPTS += +define+WAIT_CYCLES=$(WAIT_CYCLES)
 COMPILE_OPTS += +define+INJECT_ERROR=$(INJECT_ERROR)
+COMPILE_OPTS += -ignore initializer_driver_checks
+COMPILE_OPTS += -LDFLAGS "-L$(VCS_HOME)/linux64/lib -lnativeuvm"
 
 all: comp run
 
 comp:
 	@mkdir -p $(SIM_OUTPUT)
 	vcs $(COMPILE_OPTS) -o $(SIM_OUTPUT)/simv \
+		$(UVM_HOME)/src/uvm_pkg.sv \
+		$(UVM_HOME)/dpi/uvm_dpi.cc \
+		../src/apb_defines.svh \
+		../src/apb_interface.sv \
 		../src/apb_pkg.sv \
+		../tb/apb_slave_ram.sv \
 		../tb/apb_tb_pkg.sv \
-		../tb/apb_tb_top.sv
+		../tb/apb_tb_top.sv \
+		-CFLAGS "-DVCS" \
+		-LDFLAGS "-L$(VCS_HOME)/linux64/lib"
 
 run:
-	$(SIM_OUTPUT)/simv +UVM_TESTNAME=$(TEST) +UVM_VERBOSITY=UVM_MEDIUM
+	$(SIM_OUTPUT)/simv +UVM_TESTNAME=$(TEST) +UVM_VERBOSITY=UVM_MEDIUM \
+		-sv_lib $(VCS_HOME)/linux64/lib/libnativeuvm \
+		+UVM_NO_DPI
 
 clean:
 	rm -rf $(SIM_OUTPUT) csrc *.log *.key *.vpd *.vdb simv simv.daidir
