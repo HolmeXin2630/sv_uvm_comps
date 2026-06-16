@@ -13,6 +13,7 @@ package hx_apb_tb_pkg;
     `include "apb_smoke_test.sv"
     `include "apb_wait_state_test.sv"
     `include "apb_slverr_test.sv"
+    `include "apb_random_test.sv"
 
 endpackage
 
