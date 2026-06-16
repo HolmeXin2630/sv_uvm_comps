@@ -10,6 +10,7 @@ package hx_apb_tb_pkg;
     // `include "apb_slave_ram.sv"
 
     `include "apb_base_test.sv"
+    `include "apb_smoke_test.sv"
 
 endpackage
 
