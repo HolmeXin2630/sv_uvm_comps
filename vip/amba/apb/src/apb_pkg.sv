@@ -10,6 +10,7 @@ package hx_apb_pkg;
     // Components
     `include "apb_transaction.sv"
     `include "apb_config.sv"
+    `include "apb_sequencer.sv"
     // TODO: `include remaining components
     // ...
 
