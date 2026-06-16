@@ -11,6 +11,7 @@ package hx_apb_tb_pkg;
 
     `include "apb_base_test.sv"
     `include "apb_smoke_test.sv"
+    `include "apb_wait_state_test.sv"
 
 endpackage
 
