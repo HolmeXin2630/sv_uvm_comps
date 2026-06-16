@@ -14,6 +14,7 @@ package hx_apb_pkg;
     `include "apb_monitor.sv"
     `include "apb_driver.sv"
     `include "apb_slave_driver.sv"
+    `include "apb_agent.sv"
     // TODO: `include remaining components
     // ...
 
