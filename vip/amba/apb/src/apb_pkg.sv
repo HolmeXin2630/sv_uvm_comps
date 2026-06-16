@@ -5,8 +5,9 @@ package hx_apb_pkg;
     import uvm_pkg::*;
     `include "uvm_macros.svh"
 
-    // TODO: `include 所有组件
-    // `include "apb_defines.svh"
+    `include "apb_defines.svh"
+
+    // TODO: `include remaining components
     // `include "apb_transaction.sv"
     // ...
 
