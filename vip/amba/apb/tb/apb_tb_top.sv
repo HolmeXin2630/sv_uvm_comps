@@ -4,6 +4,7 @@
 module apb_tb_top;
     import uvm_pkg::*;
     import hx_apb_pkg::*;
+    import hx_apb_tb_pkg::*;
     `include "uvm_macros.svh"
 
     // Clock and reset

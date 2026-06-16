@@ -16,7 +16,10 @@ COMPILE_OPTS += +define+INJECT_ERROR=$(INJECT_ERROR)
 all: comp run
 
 comp:
+	@mkdir -p $(SIM_OUTPUT)
 	vcs $(COMPILE_OPTS) -o $(SIM_OUTPUT)/simv \
+		../src/apb_pkg.sv \
+		../tb/apb_tb_pkg.sv \
 		../tb/apb_tb_top.sv
 
 run:
