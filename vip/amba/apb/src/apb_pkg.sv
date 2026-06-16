@@ -11,6 +11,7 @@ package hx_apb_pkg;
     `include "apb_transaction.sv"
     `include "apb_config.sv"
     `include "apb_sequencer.sv"
+    `include "apb_monitor.sv"
     // TODO: `include remaining components
     // ...
 
