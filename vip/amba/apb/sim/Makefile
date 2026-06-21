@@ -41,3 +41,16 @@ run:
 
 clean:
 	rm -rf $(SIM_OUTPUT) csrc *.log *.key *.vpd *.vdb simv simv.daidir
+
+regression: comp
+	@echo "=== Running Regression Tests ==="
+	@for test in apb_smoke_test apb_directed_test apb_random_test apb_slverr_test apb_wait_state_test apb_reset_test; do \
+		echo "=== Running $$test ===" && \
+		$(SIM_OUTPUT)/simv +UVM_TESTNAME=$$test +UVM_VERBOSITY=UVM_MEDIUM \
+			-sv_lib $(VCS_HOME)/linux64/lib/libnativeuvm \
+			+UVM_NO_DPI 2>&1 | grep -E "(UVM_ERROR|UVM_FATAL|PASSED|FAILED|Report)" | tail -5; \
+	done
+	@echo "=== Regression Complete ==="
+
+verify: comp
+	@./verify_regression.sh

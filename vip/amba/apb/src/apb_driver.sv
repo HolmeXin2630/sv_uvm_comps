@@ -13,42 +13,68 @@ class apb_driver extends uvm_driver #(apb_transaction);
     task run_phase(uvm_phase phase);
         apb_transaction txn;
         forever begin
-            seq_item_port.get_next_item(txn);
+            // Wait for reset release
+            @(posedge vif.PRESETn);
 
-            // Idle cycles
-            repeat (txn.idle_cycles) @(vif.master_cb);
+            // Main driving loop
+            fork begin
+                fork
+                    begin
+                        // Driving loop
+                        forever begin
+                            seq_item_port.get_next_item(txn);
 
-            // SETUP phase: PSEL=1, PENABLE=0
-            @(vif.master_cb);
-            vif.master_cb.PSEL    <= 1'b1;
-            vif.master_cb.PENABLE <= 1'b0;
-            vif.master_cb.PADDR   <= txn.addr;
-            vif.master_cb.PWRITE  <= txn.write;
-            if (txn.write)
-                vif.master_cb.PWDATA <= txn.data;
-            `ifdef APB_APB4_ENABLE
-            vif.master_cb.PSTRB <= txn.strb;
-            vif.master_cb.PPROT <= txn.prot;
-            `endif
+                            // Idle cycles
+                            repeat (txn.idle_cycles) @(vif.master_cb);
 
-            // ACCESS phase: PENABLE=1
-            @(vif.master_cb);
-            vif.master_cb.PENABLE <= 1'b1;
+                            // SETUP phase: PSEL=1, PENABLE=0
+                            @(vif.master_cb);
+                            vif.master_cb.PSEL    <= 1'b1;
+                            vif.master_cb.PENABLE <= 1'b0;
+                            vif.master_cb.PADDR   <= txn.addr;
+                            vif.master_cb.PWRITE  <= txn.write;
+                            if (txn.write)
+                                vif.master_cb.PWDATA <= txn.data;
+                            `ifdef APB_APB4_ENABLE
+                            vif.master_cb.PSTRB <= txn.strb;
+                            vif.master_cb.PPROT <= txn.prot;
+                            `endif
 
-            // Wait for PREADY
-            while (!vif.master_cb.PREADY) @(vif.master_cb);
+                            // ACCESS phase: PENABLE=1
+                            @(vif.master_cb);
+                            vif.master_cb.PENABLE <= 1'b1;
 
-            // Sample response for read
-            if (!txn.write)
-                txn.data = vif.master_cb.PRDATA;
-            txn.slverr = vif.master_cb.PSLVERR;
+                            // Wait for PREADY
+                            while (!vif.master_cb.PREADY) @(vif.master_cb);
 
-            // Return to IDLE
-            @(vif.master_cb);
+                            // Sample response for read
+                            if (!txn.write)
+                                txn.data = vif.master_cb.PRDATA;
+                            txn.slverr = vif.master_cb.PSLVERR;
+
+                            // Return to IDLE
+                            @(vif.master_cb);
+                            vif.master_cb.PSEL    <= 1'b0;
+                            vif.master_cb.PENABLE <= 1'b0;
+
+                            seq_item_port.item_done();
+                        end
+                    end
+                    begin
+                        // Reset detection
+                        @(negedge vif.PRESETn);
+                    end
+                join_any
+                disable fork;
+            end join
+
+            // Reset cleanup
+            `uvm_info("DRV", "Reset detected — cleaning up", UVM_MEDIUM)
             vif.master_cb.PSEL    <= 1'b0;
             vif.master_cb.PENABLE <= 1'b0;
-
-            seq_item_port.item_done();
+            vif.master_cb.PADDR   <= '0;
+            vif.master_cb.PWRITE  <= 1'b0;
+            vif.master_cb.PWDATA  <= '0;
         end
     endtask
 endclass

@@ -70,6 +70,45 @@ interface apb_interface #(
     modport slave   (clocking slave_cb,   input PRESETn);
     modport monitor (clocking monitor_cb, input PRESETn);
 
+    // Protocol assertions
+    // Check stability during ACCESS phase (after PENABLE is asserted)
+    property apb_stable_addr;
+        @(posedge PCLK) PSEL && PENABLE |-> $stable(PADDR);
+    endproperty
+
+    property apb_stable_write;
+        @(posedge PCLK) PSEL && PENABLE |-> $stable(PWRITE);
+    endproperty
+
+    property apb_stable_wdata;
+        @(posedge PCLK) PSEL && PENABLE && PWRITE |-> $stable(PWDATA);
+    endproperty
+
+    // Check PENABLE assertion after SETUP phase
+    property apb_penable_after_psel;
+        @(posedge PCLK) $rose(PSEL) && !PENABLE |=> PENABLE;
+    endproperty
+
+    // Check PREADY assertion after PENABLE
+    property apb_pready_after_penable;
+        @(posedge PCLK) PSEL && $rose(PENABLE) |-> ##[0:$] PREADY;
+    endproperty
+
+    assert property (apb_stable_addr)
+        else $error("APB_CHK: Address changed during access phase");
+
+    assert property (apb_stable_write)
+        else $error("APB_CHK: Write signal changed during access phase");
+
+    assert property (apb_stable_wdata)
+        else $error("APB_CHK: Write data changed during access phase");
+
+    assert property (apb_penable_after_psel)
+        else $error("APB_CHK: PENABLE not asserted after PSEL");
+
+    assert property (apb_pready_after_penable)
+        else $error("APB_CHK: PREADY not asserted after PENABLE");
+
 endinterface
 
 `endif // APB_INTERFACE_SV

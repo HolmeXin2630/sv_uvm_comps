@@ -1,0 +1,9 @@
+# .ic-verifier.yml - IC Verifier Project Configuration
+simulator: vcs
+compile_cmd: "vcs -sverilog -full64 -timescale=1ns/1ps +define+UVM_PACKER_MAX_BYTES=1500000 +define+UVM_DISABLE_AUTO_ITEM_RECORDING +incdir+../src +incdir+../tb +incdir+../test +incdir+$(UVM_HOME)/src +define+WAIT_CYCLES=$(WAIT_CYCLES) +define+INJECT_ERROR=$(INJECT_ERROR) -ignore initializer_driver_checks -LDFLAGS '-L$(VCS_HOME)/linux64/lib -lnativeuvm'"
+elaborate_cmd: ""
+sim_cmd: "./output/simv +UVM_TESTNAME=$(TEST) +UVM_VERBOSITY=UVM_MEDIUM -sv_lib $(VCS_HOME)/linux64/lib/libnativeuvm +UVM_NO_DPI"
+lint_cmd: ""
+regression_cmd: "make regression"
+work_dir: "sim"
+waveform_cmd: ""
