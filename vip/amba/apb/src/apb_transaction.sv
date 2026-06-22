@@ -47,6 +47,36 @@ class apb_transaction extends uvm_sequence_item;
         return s;
     endfunction
 
+    // Compare method for scoreboard
+    virtual function bit do_compare(uvm_object rhs, uvm_comparer comparer);
+        apb_transaction rhs_cast;
+        if (!$cast(rhs_cast, rhs))
+            return 0;
+
+        // Compare all fields except response fields and metadata
+        return (addr  == rhs_cast.addr) &&
+               (data  == rhs_cast.data) &&
+               (write == rhs_cast.write);
+    endfunction
+
+    // Copy method for clone operations
+    virtual function void do_copy(uvm_object rhs);
+        apb_transaction rhs_cast;
+        super.do_copy(rhs);
+        if (!$cast(rhs_cast, rhs))
+            `uvm_fatal("COPY", "Type cast failed in do_copy")
+
+        addr        = rhs_cast.addr;
+        data        = rhs_cast.data;
+        write       = rhs_cast.write;
+        idle_cycles = rhs_cast.idle_cycles;
+        slverr      = rhs_cast.slverr;
+    `ifdef APB_APB4_ENABLE
+        strb = rhs_cast.strb;
+        prot = rhs_cast.prot;
+    `endif
+    endfunction
+
 endclass
 
 `endif // APB_TRANSACTION_SV

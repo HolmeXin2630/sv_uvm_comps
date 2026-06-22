@@ -65,11 +65,6 @@ interface apb_interface #(
         input PPROT;
     endclocking
 
-    // Modports
-    modport master  (clocking master_cb,  input PRESETn);
-    modport slave   (clocking slave_cb,   input PRESETn);
-    modport monitor (clocking monitor_cb, input PRESETn);
-
     // Protocol assertions
     // Check stability during ACCESS phase (after PENABLE is asserted)
     property apb_stable_addr;
