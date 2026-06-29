@@ -17,8 +17,10 @@ interface apb_interface #(
     logic [DATA_WIDTH-1:0]   PRDATA;
     logic                    PREADY;
     logic                    PSLVERR;
+`ifdef APB_APB4_ENABLE
     logic [DATA_WIDTH/8-1:0] PSTRB;
     logic [2:0]              PPROT;
+`endif
 
     // Master clocking block
     clocking master_cb @(posedge PCLK);
@@ -28,8 +30,10 @@ interface apb_interface #(
         output PADDR;
         output PWRITE;
         output PWDATA;
+    `ifdef APB_APB4_ENABLE
         output PSTRB;
         output PPROT;
+    `endif
         input  PRDATA;
         input  PREADY;
         input  PSLVERR;
@@ -43,8 +47,10 @@ interface apb_interface #(
         input  PADDR;
         input  PWRITE;
         input  PWDATA;
+    `ifdef APB_APB4_ENABLE
         input  PSTRB;
         input  PPROT;
+    `endif
         output PRDATA;
         output PREADY;
         output PSLVERR;
@@ -61,8 +67,10 @@ interface apb_interface #(
         input PRDATA;
         input PREADY;
         input PSLVERR;
+    `ifdef APB_APB4_ENABLE
         input PSTRB;
         input PPROT;
+    `endif
     endclocking
 
     // Protocol assertions

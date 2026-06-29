@@ -18,8 +18,6 @@ package hx_apb_pkg;
     `include "apb_sequences.sv"
     `include "apb_coverage.sv"
     `include "apb_scoreboard.sv"
-    // TODO: `include remaining components
-    // ...
 
 endpackage
 

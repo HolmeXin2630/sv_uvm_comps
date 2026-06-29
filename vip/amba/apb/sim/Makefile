@@ -3,6 +3,7 @@ SIM_OUTPUT ?= $(CURDIR)/output
 TEST ?= apb_smoke_test
 WAIT_CYCLES ?= 0
 INJECT_ERROR ?= 0
+APB4_ENABLE ?= 0
 
 UVM_HOME ?= /opt/synopsys/vcs/W-2024.09/etc/uvm-1.2
 
@@ -15,6 +16,9 @@ COMPILE_OPTS += +incdir+../test
 COMPILE_OPTS += +incdir+$(UVM_HOME)/src
 COMPILE_OPTS += +define+WAIT_CYCLES=$(WAIT_CYCLES)
 COMPILE_OPTS += +define+INJECT_ERROR=$(INJECT_ERROR)
+ifeq ($(APB4_ENABLE),1)
+COMPILE_OPTS += +define+APB_APB4_ENABLE
+endif
 COMPILE_OPTS += -ignore initializer_driver_checks
 COMPILE_OPTS += -LDFLAGS "-L$(VCS_HOME)/linux64/lib -lnativeuvm"
 
@@ -50,6 +54,13 @@ regression: comp
 			-sv_lib $(VCS_HOME)/linux64/lib/libnativeuvm \
 			+UVM_NO_DPI 2>&1 | grep -E "(UVM_ERROR|UVM_FATAL|PASSED|FAILED|Report)" | tail -5; \
 	done
+ifeq ($(APB4_ENABLE),1)
+	@echo "=== Running APB4 Tests ==="
+	@echo "=== Running apb_apb4_test ===" && \
+	$(SIM_OUTPUT)/simv +UVM_TESTNAME=apb_apb4_test +UVM_VERBOSITY=UVM_MEDIUM \
+		-sv_lib $(VCS_HOME)/linux64/lib/libnativeuvm \
+		+UVM_NO_DPI 2>&1 | grep -E "(UVM_ERROR|UVM_FATAL|PASSED|FAILED|Report|APB4)" | tail -15
+endif
 	@echo "=== Regression Complete ==="
 
 verify: comp

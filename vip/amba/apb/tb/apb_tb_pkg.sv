@@ -16,6 +16,7 @@ package hx_apb_tb_pkg;
     `include "apb_random_test.sv"
     `include "apb_directed_test.sv"
     `include "apb_reset_test.sv"
+    `include "apb_apb4_test.sv"
 
 endpackage
 

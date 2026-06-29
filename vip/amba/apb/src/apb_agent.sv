@@ -17,7 +17,6 @@ class apb_agent extends uvm_agent;
     extern function new(string name, uvm_component parent);
     extern virtual function void build_phase(uvm_phase phase);
     extern virtual function void connect_phase(uvm_phase phase);
-    extern virtual task run_phase(uvm_phase phase);
 endclass
 
 function apb_agent::new(string name, uvm_component parent);
@@ -65,18 +64,5 @@ function void apb_agent::connect_phase(uvm_phase phase);
         end
     end
 endfunction
-
-// Agent controls driver/monitor lifecycle (uvc_gen pattern)
-task apb_agent::run_phase(uvm_phase phase);
-    fork
-        mon.run();
-        if (cfg.is_active == UVM_ACTIVE) begin
-            if (cfg.master_mode)
-                drv.run();
-            else
-                slave_drv.run();
-        end
-    join
-endtask
 
 `endif // APB_AGENT_SV

@@ -13,6 +13,10 @@ class apb_transaction extends uvm_sequence_item;
 `ifdef APB_APB4_ENABLE
     rand bit [`APB_DATA_WIDTH/8-1:0] strb;
     rand bit [2:0]                    prot;
+
+    constraint c_strb_nonzero {
+        strb != 0;  // At least one byte lane must be active
+    }
 `endif
 
     // Response fields (filled by driver/monitor)
@@ -23,12 +27,7 @@ class apb_transaction extends uvm_sequence_item;
         idle_cycles inside {[0:5]};
     }
 
-    `ifdef APB_APB4_ENABLE
-    constraint c_strb_default {
-        strb == {(`APB_DATA_WIDTH/8){1'b1}};
-    }
-    `endif
-
+    
     // Constructor
     function new(string name = "apb_transaction");
         super.new(name);

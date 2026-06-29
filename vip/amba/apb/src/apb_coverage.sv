@@ -48,6 +48,24 @@ class apb_coverage extends uvm_subscriber #(apb_transaction);
         cx_write_err: cross cp_write, cp_slverr;
         cx_write_addr: cross cp_write, cp_addr_range;
         cx_write_data: cross cp_write, cp_data_pattern;
+
+    `ifdef APB_APB4_ENABLE
+        cp_strb: coverpoint txn.strb {
+            bins all_bytes = {4'hF};
+            bins partial   = {[4'h1:4'hE]};
+            bins single    = {4'h1, 4'h2, 4'h4, 4'h8};
+        }
+
+        cp_prot: coverpoint txn.prot {
+            bins normal    = {3'b000};
+            bins privileged = {3'b001};
+            bins secure    = {3'b010};
+            bins other     = default;
+        }
+
+        cx_write_strb: cross cp_write, cp_strb;
+        cx_write_prot: cross cp_write, cp_prot;
+    `endif
     endgroup
 
     function new(string name, uvm_component parent);

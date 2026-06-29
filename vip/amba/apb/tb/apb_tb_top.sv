@@ -40,6 +40,9 @@ module apb_tb_top;
         .PRDATA  (apb_if.PRDATA),
         .PREADY  (apb_if.PREADY),
         .PSLVERR (apb_if.PSLVERR)
+    `ifdef APB_APB4_ENABLE
+        ,.PSTRB  (apb_if.PSTRB)
+    `endif
     );
 
     // Set vif

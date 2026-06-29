@@ -9,6 +9,7 @@ class apb_driver extends uvm_driver #(apb_transaction);
 
     extern function new(string name, uvm_component parent);
     extern virtual function void build_phase(uvm_phase phase);
+    extern virtual task run_phase(uvm_phase phase);
     extern virtual task run();
     extern virtual protected task get_and_drive();
     extern virtual protected task drive_trans(apb_transaction txn);
@@ -22,6 +23,10 @@ function void apb_driver::build_phase(uvm_phase phase);
     super.build_phase(phase);
     vif = cfg.vif;  // VIF from config, not config_db
 endfunction
+
+task apb_driver::run_phase(uvm_phase phase);
+    run();
+endtask
 
 // Reset-aware main loop (uvc_gen pattern)
 task apb_driver::run();

@@ -6,6 +6,8 @@ class apb_base_test extends uvm_test;
 
     // Components
     apb_agent         apb_agt;
+    apb_scoreboard    scb;
+    apb_coverage      cov;
     apb_system_config sys_cfg;
 
     function new(string name = "apb_base_test", uvm_component parent = null);
@@ -24,6 +26,16 @@ class apb_base_test extends uvm_test;
 
         // Inject config (dependency injection)
         apb_agt.cfg = sys_cfg.master_cfg;
+
+        // Create scoreboard and coverage
+        scb = apb_scoreboard::type_id::create("scb", this);
+        cov = apb_coverage::type_id::create("cov", this);
+    endfunction
+
+    function void connect_phase(uvm_phase phase);
+        super.connect_phase(phase);
+        apb_agt.mon_ap.connect(scb.ap);
+        apb_agt.mon_ap.connect(cov.analysis_export);
     endfunction
 
     function void end_of_elaboration_phase(uvm_phase phase);

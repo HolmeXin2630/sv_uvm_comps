@@ -20,9 +20,16 @@ class apb_scoreboard extends uvm_scoreboard;
 
     function void write(apb_transaction t);
         if (t.write) begin
-            // Store write data
+            // Store write data (byte-lane aware with PSTRB)
+        `ifdef APB_APB4_ENABLE
+            for (int i = 0; i < `APB_DATA_WIDTH/8; i++) begin
+                if (t.strb[i])
+                    expected_mem[t.addr][i*8 +: 8] = t.data[i*8 +: 8];
+            end
+        `else
             expected_mem[t.addr] = t.data;
-            `uvm_info("SCB", $sformatf("Write: addr=0x%08h, data=0x%08h", t.addr, t.data), UVM_HIGH)
+        `endif
+            `uvm_info("SCB", $sformatf("Write: addr=0x%08h, data=0x%08h strb=0x%0h", t.addr, t.data, t.strb), UVM_HIGH)
         end else begin
             // Check read data
             if (expected_mem.exists(t.addr)) begin
