@@ -6,7 +6,7 @@ class ahb_agent_config extends uvm_object;
     `uvm_object_utils(ahb_agent_config)
 
     // Mode
-    bit active = 1;  // 1=active, 0=passive
+    uvm_active_passive_enum is_active = UVM_ACTIVE;
 
     // Width
     int addr_width = `AHB_ADDR_WIDTH;
@@ -18,7 +18,7 @@ class ahb_agent_config extends uvm_object;
     // Wait cycles (for slave)
     int unsigned wait_cycles = 0;
 
-    // Virtual interface (set by tb_top via config_db)
+    // Virtual interface (set by agent via config_db, consumed by driver/monitor)
     virtual ahb_interface vif;
 
     function new(string name = "ahb_agent_config");

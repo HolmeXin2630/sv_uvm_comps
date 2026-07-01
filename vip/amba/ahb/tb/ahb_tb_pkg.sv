@@ -13,6 +13,7 @@ package hx_ahb_tb_pkg;
     `include "ahb_pipeline_test.sv"
     `include "ahb_wait_state_test.sv"
     `include "ahb_error_resp_test.sv"
+    `include "ahb_slave_test.sv"
 
 endpackage
 

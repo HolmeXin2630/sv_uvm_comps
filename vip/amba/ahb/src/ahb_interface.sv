@@ -79,10 +79,25 @@ interface ahb_interface #(
         input HGRANT;
     endclocking
 
-    // Modports
-    modport master  (clocking master_cb,  input HRESETn);
-    modport slave   (clocking slave_cb,   input HRESETn);
-    modport monitor (clocking monitor_cb, input HRESETn);
+    // No modports — use clocking blocks only (coding standard)
+
+    // Reset cleanup tasks for driver/monitor
+    task reset_master_signals();
+        HADDR     <= '0;
+        HTRANS    <= 2'b00;  // IDLE
+        HWRITE    <= '0;
+        HSIZE     <= '0;
+        HBURST    <= '0;
+        HPROT     <= '0;
+        HWDATA    <= '0;
+        HMASTLOCK <= '0;
+    endtask
+
+    task reset_slave_signals();
+        HRDATA <= '0;
+        HREADY <= 1'b1;
+        HRESP  <= 2'b00;  // OKAY
+    endtask
 
 endinterface
 

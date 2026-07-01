@@ -33,6 +33,7 @@ class ahb_env_config extends uvm_object;
             master_cfg[i] = ahb_agent_config::type_id::create($sformatf("master_cfg[%0d]", i));
         foreach (slave_cfg[i]) begin
             slave_cfg[i] = ahb_agent_config::type_id::create($sformatf("slave_cfg[%0d]", i));
+            slave_cfg[i].is_active = UVM_PASSIVE;  // DUT drives responses
             slave_base_addr[i] = i * 'h1000;
             slave_size[i] = 'h1000;
         end

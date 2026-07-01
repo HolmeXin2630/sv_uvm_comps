@@ -71,6 +71,13 @@ class ahb_scoreboard extends uvm_component;
         else mismatch_count++;
     endfunction
 
+    function void check_phase(uvm_phase phase);
+        super.check_phase(phase);
+        if (master_bursts.size() > 0)
+            `uvm_error("SCB", $sformatf(
+                "%0d master bursts not matched by slave response", master_bursts.size()))
+    endfunction
+
     function void report_phase(uvm_phase phase);
         `uvm_info("SCB", $sformatf("Burst matches=%0d, mismatches=%0d", match_count, mismatch_count), UVM_LOW)
     endfunction
